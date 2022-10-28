@@ -54,7 +54,7 @@ CFW 启动流程如下：
 
 步骤 1 完成后，Clash 会按照 config.yaml 设置启动
 
-步骤 2 完成后，用户配置文件里的`proxies/proxy-providers/proxy-groups/rule-providers/rules/dns`这几个字段的内容会被替换到 Clash 里面，除了上面值几个字段，其他的内容均不会替换（这就是 Profiles 里配置文件可以不完整的原因）
+步骤 2 完成后，用户配置文件里的`proxies/proxy-providers/proxy-groups/rule-providers/rules/dns`这几个字段的内容会被替换到 Clash 里面，除了上面这几个字段，其他的内容均不会替换（这就是 Profiles 里配置文件可以不完整的原因）
 
 ### 原因
 
