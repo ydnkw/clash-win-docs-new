@@ -28,31 +28,43 @@
 ::: tip NOTICE
 由于查询防火墙权限受限等原因，指示灯可能无法正常工作，请以系统防火墙列表及 Clash 网卡运行状态为准。
 
-这里提供一个可用于自查的 PowerShell 脚本（视情况需以管理员权限运行）：
+这里提供一个可用于自查的 PowerShell 脚本（可能需要管理员权限）：
 
-```PowerShell
-$List = Get-NetFirewallRule -Enabled True | Where-Object {($_.DisplayName -eq "Clash Core") -and ($_.Description -eq "Work with Clash for Windows.") -and ($_.Action -eq "Allow")}
-$Output = $List | ForEach-Object {
-    $Program = $_ | Get-NetFirewallApplicationFilter | Select-Object -ExpandProperty Program
-    $Protocol = $_ | Get-NetFirewallPortFilter | Select-Object -ExpandProperty Protocol
-    $Rule = New-Object PsObject
-    $Rule | Add-Member -MemberType NoteProperty -Name "Enabled" -Value $_.Enabled
-    $Rule | Add-Member -MemberType NoteProperty -Name "Action" -Value $_.Action
-    $Rule | Add-Member -MemberType NoteProperty -Name "Protocol" -Value $Protocol
-    $Rule | Add-Member -MemberType NoteProperty -Name "Program" -Value $Program
-    $Rule
+```powershell
+#Requires -Version 3
+#Requires -Modules NetSecurity
+
+$List = Get-NetFirewallRule -Enabled True -Action Allow -Description 'Work with Clash for Windows.' | Where-Object { 'Clash Core' -eq $_.DisplayName }
+$Report = foreach ($Rule in $List)
+{
+    $Program = (Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $Rule).Program
+
+    [pscustomobject] @{
+        Enabled     = $Rule.Enabled
+        Action      = $Rule.Action
+        Protocol    = (Get-NetFirewallPortFilter -AssociatedNetFirewallRule $Rule).Protocol
+        Program     = $Program
+        IsPathValid = Test-Path -PathType Leaf -LiteralPath $Program
+    }
 }
-$Output | Format-Table
-Read-Host -Prompt "Press any key to continue"
+$Report
+Pause
 ```
 
-以64位版本为例，如果输出类似以下内容则说明规则添加成功（请自行验证路径有效性）：
+以 x86-64 版本为例，如果输出类似以下内容，那么规则添加成功（请自行验证 `Program` 路径的有效性）：
 
-```PowerShell
-Enabled Action Protocol Program
-------- ------ -------- -------
-   True  Allow TCP      C:\...\resources\static\files\win\x64\clash-win64.exe
-   True  Allow UDP      C:\...\resources\static\files\win\x64\clash-win64.exe
+```yaml
+Enabled     : True
+Action      : Allow
+Protocol    : TCP
+Program     : C:\Program Files\Clash for Windows\resources\static\files\win\x64\clash-win64.exe
+IsPathValid : True
+
+Enabled     : True
+Action      : Allow
+Protocol    : UDP
+Program     : C:\Program Files\Clash for Windows\resources\static\files\win\x64\clash-win64.exe
+IsPathValid : True
 ```
 :::
 
