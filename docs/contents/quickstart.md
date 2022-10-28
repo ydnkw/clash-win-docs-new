@@ -31,7 +31,7 @@
 
 ## 打开系统代理及开机自启选项
 
-返回 General 中，打开`System Proxy`及`Starts with Windows`两个开关即可
+返回 General 中，打开`System Proxy`及`Start with Windows`两个开关即可
 
 - System Proxy：设置系统代理
 - Start with Windows：开机自启动
