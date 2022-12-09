@@ -207,7 +207,7 @@ raw 是一个字符串，一般需要用 yaml 库解析成 JavaScript 对象
 
 ```yaml
 parsers:
-  - reg: https://test.com.+$ # 正则匹配域名
+  - reg: ^https://test\.com/.+$ # 正则匹配域名
     yaml:
       prepend-rules:
         - DOMAIN,test.com,DIRECT
